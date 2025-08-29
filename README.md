@@ -9,7 +9,7 @@ That means this repo is more than just a folder of source files—it’s a livin
 ---
 
 ## 👥 The Team
-We’re a team of **five developers** who each bring different strengths (and caffeine preferences) to the table. Together, we handle:
+We’re a team of **five** who each bring different strengths (and caffeine preferences) to the table. Together, we handle:
 - 💡 **Ideation** – tossing around app concepts until one sticks.  
 - 📝 **Design** – sketching flows, wireframes, and UI mockups.  
 - 💻 **Development** – writing code that (hopefully) runs the first time.  

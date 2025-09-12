@@ -54,14 +54,6 @@ This repository is our central hub for everything App Dev:
 4. **Process Logs** – evidence that the *journey* is as important as the destination.  
 
 ---
-
-## 📂 Structure
-You can expect to find:
-- `src/` → main codebase of the app.  
-- `docs/` → design documents, UML diagrams, notes.  
-- `prototypes/` → proof-of-concepts and experimental builds.  
-- `README.md` → this file, your guide to understanding what’s going on.  
-
 ---
 
 ## 🚀 Our Philosophy

@@ -26,25 +26,6 @@ An enterprise-grade, modular Point-of-Sale extension built for Julies Bakeshop a
 - **Graceful Maintenance Mode** (`maintenance.php`) with custom “Temporarily Closed” messaging  
 - **Automated Database Backups** on scheduled intervals  
 
-### 5. Scalable, Modular Codebase  
-/
-├── .vscode/ # IDE settings
-├── css/ # SCSS/CSS styles (modular SCSS workflow)
-├── js/ # Custom JS, plugins, DataTables, select2
-├── bsms/images/ # Julies Bakeshop assets
-├── Font-Awesome-master/ # Icon library
-├── select2/ # Enhanced dropdown components
-├── database/ # MySQL schema scripts & seed data
-├── Actions.php # Centralized AJAX handlers
-├── DBConnection.php # PDO-based database abstraction
-├── login.php # Authentication flow
-├── home.php # Main dashboard
-├── manage_account.php # Admin user management
-├── manage_category.php # Product category CRUD
-├── manage_product.php # Product catalog CRUD
-├── manage_shifts.php # Cashier shift scheduling
-└── maintenance.php # Downtime handler
-=======
 # 🌟 App Dev Project Repository
 
 Welcome to our **Application Development course project repo**!  

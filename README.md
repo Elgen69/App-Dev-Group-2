@@ -89,5 +89,4 @@ By the end of the semester, this repo will serve as both:
 
 ## ✨ Closing Note
 This is more than just homework—it’s a **collective story of five students learning to build, fail, adapt, and build again**.  
-Stick around, explore the branches, and watch the process unf
->>>>>>> bdab89bc16030de12a4656bc0cc0a23c93d6a2eb
+Stick around, explore the branches, and watch the process unfold.

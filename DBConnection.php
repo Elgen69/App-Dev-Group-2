@@ -16,6 +16,7 @@ class DBConnection {
      * The constructor initializes the database connection using the mysqli constructor.
      * It checks if the connection was successful and terminates the script with an error message if it fails.
      */
+     /* Add port number if it doesn't work for lab local */
     function __construct() {
         $this->db = new mysqli('localhost', 'root', '', 'julies_db', 3307);
         if (!$this->db) {

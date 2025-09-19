@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-# Julies Bakeshop POS System – SAAD Extension
+# Julies Bakeshop POS System – App Dev Extension
 
 An enterprise-grade, modular Point-of-Sale extension built for Julies Bakeshop as part of our System Analysis & Design (SAAD) deliverables. This PHP & JavaScript codebase enhances the original IM 2 POS with secure authentication, dynamic order management, real-time reporting, and a scalable architecture ready for production.
 
@@ -52,17 +51,6 @@ This repository is our central hub for everything App Dev:
 2. **Documentation** – notes, requirements, diagrams, and design artifacts.  
 3. **Experiments** – branches and prototypes where we test out features.  
 4. **Process Logs** – evidence that the *journey* is as important as the destination.  
-
----
-
-## 📂 Structure
-You can expect to find:
-- `src/` → main codebase of the app.  
-- `docs/` → design documents, UML diagrams, notes.  
-- `prototypes/` → proof-of-concepts and experimental builds.  
-- `README.md` → this file, your guide to understanding what’s going on.  
-
----
 
 ## 🚀 Our Philosophy
 This repo is **not** a showcase of flawless code. Instead, it’s a playground where ideas evolve into reality.  

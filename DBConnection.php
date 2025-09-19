@@ -17,7 +17,7 @@ class DBConnection {
      * It checks if the connection was successful and terminates the script with an error message if it fails.
      */
     function __construct() {
-        $this->db = new mysqli('localhost', 'root', '', 'julies_db');
+        $this->db = new mysqli('localhost', 'root', '', 'julies_db', 3307);
         if (!$this->db) {
             die('Database Connection Failed. Error: ' . $this->db->error);
         }

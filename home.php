@@ -1,41 +1,74 @@
 <style>
-    .glowing-border {
-        padding: 1rem;
-        background: linear-gradient(145deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
-        border-radius: 20px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
-        position: relative;
-        overflow: hidden;
-        animation: glowing 5s linear infinite;
-    }
-
-    @keyframes glowing {
-        0% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.5), 0 0 20px rgba(255, 0, 0, 0.3), 0 0 30px rgba(255, 0, 0, 0.2); }
-        12.5% { box-shadow: 0 0 20px rgba(255, 127, 0, 0.5), 0 0 30px rgba(255, 127, 0, 0.3), 0 0 40px rgba(255, 127, 0, 0.2); }
-        25% { box-shadow: 0 0 10px rgba(255, 255, 0, 0.5), 0 0 20px rgba(255, 255, 0, 0.3), 0 0 30px rgba(255, 255, 0, 0.2); }
-        37.5% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.5), 0 0 30px rgba(0, 255, 0, 0.3), 0 0 40px rgba(0, 255, 0, 0.2); }
-        50% { box-shadow: 0 0 10px rgba(0, 0, 255, 0.5), 0 0 20px rgba(0, 0, 255, 0.3), 0 0 30px rgba(0, 0, 255, 0.2); }
-        62.5% { box-shadow: 0 0 20px rgba(75, 0, 130, 0.5), 0 0 30px rgba(75, 0, 130, 0.3), 0 0 40px rgba(75, 0, 130, 0.2); }
-        75% { box-shadow: 0 0 10px rgba(148, 0, 211, 0.5), 0 0 20px rgba(148, 0, 211, 0.3), 0 0 30px rgba(148, 0, 211, 0.2); }
-        87.5% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.5), 0 0 30px rgba(255, 0, 0, 0.3), 0 0 40px rgba(255, 0, 0, 0.2); }
-        100% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.5), 0 0 20px rgba(255, 0, 0, 0.3), 0 0 30px rgba(255, 0, 0, 0.2); }
-    }
-
-    .btn-gradient {
-    background: linear-gradient(145deg, #000000, #434343);
-    color: #ffffff;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background 0.3s ease;
+:root{
+    --radius:12px;
+    --card-bg:#ffffff;
+    --glow-opacity:.45;
+    --glow-blur:36px;
+    --btn-start:#2d2d2d;
+    --btn-end:#5a5a5a;
+    --btn-text:#ffffff;
 }
 
-.btn-gradient:hover {
-    background: linear-gradient(145deg, #222222, #555555);
+.glowing-border{
+    position:relative;
+    padding:1rem;
+    border-radius:var(--radius);
+    background:var(--card-bg);
+    overflow:hidden;
+    box-shadow:0 2px 8px rgba(0,0,0,0.08);
 }
 
+/* Subtle animated glow using a pseudo-element so inner content isn't affected */
+.glowing-border::before{
+    content:"";
+    position:absolute;
+    inset:-2px;
+    z-index:0;
+    background: linear-gradient(90deg, #00ffd1, #00bfff, #9b59b6, #ff7f50, #ffd700);
+    filter: blur(var(--glow-blur));
+    opacity:var(--glow-opacity);
+    transform: scale(1.02);
+    transition: opacity .3s ease;
+    animation: glow-slide 6s linear infinite;
+    pointer-events:none;
+}
+
+/* Keep content above the glow */
+.glowing-border > *{ position:relative; z-index:1; }
+
+/* Calmer keyframes for a smooth movement */
+@keyframes glow-slide{
+    0%{ transform: translateX(-30%) scale(1.02) rotate(0deg); opacity:.45; }
+    50%{ transform: translateX(30%) scale(1.03) rotate(1deg); opacity:.55; }
+    100%{ transform: translateX(-30%) scale(1.02) rotate(0deg); opacity:.45; }
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce){
+    .glowing-border::before{ animation:none; opacity:.25; filter: blur(18px); }
+}
+
+/* Improved accessible gradient button */
+.btn-gradient{
+    display:inline-block;
+    background: linear-gradient(135deg, var(--btn-start), var(--btn-end));
+    color: var(--btn-text);
+    border:none;
+    padding:6px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    box-shadow:0 4px 8px rgba(0,0,0,0.08);
+    transition: transform .12s ease, box-shadow .12s ease;
+    font-weight:600;
+}
+.btn-gradient:hover{ transform: translateY(-2px); box-shadow:0 8px 18px rgba(0,0,0,0.12); }
+.btn-gradient:focus{ outline:3px solid rgba(0,187,255,0.18); outline-offset:2px; }
+
+/* Small-screen adjustments */
+@media (max-width:576px){
+    .glowing-border{ padding:.8rem; border-radius:10px; }
+    .btn-gradient{ padding:5px 10px; font-size:.95rem; }
+}
 </style>
 
 

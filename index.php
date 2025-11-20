@@ -31,46 +31,171 @@ if($_SESSION['type'] != 1 && in_array($page,array('maintenance','products','stoc
     <script src="./js/script.js"></script>
     <style>
         :root{
-            --bs-success-rgb:71, 222, 152 !important;
+            --sidebar-width:300px;
+            --sidebar-bg-start:#071428;
+            --sidebar-bg-end:#023047;
+            --sidebar-accent:#ffb703;
+            --content-bg:#f6f7fb;
+            --text-color:#0b1220;
+            --muted:#6c757d;
+            --link-color:#e6f2ff;
+            --card-bg:#ffffff;
         }
-        html,body{
-            height:100%;
-            width:100%;
-            
-        }
-        @media (min-width: 992px) {
-            .container, .container-lg, .container-md, .container-sm {
-                max-width: 1250px;
-            }
-        }
-        .modal-priority {
-            z-index: 1050;
-        }
-        .modal-dialog {
-            max-width: 800px; 
+        /* Dark mode variables */
+        body.dark-mode{
+            --sidebar-bg-start:#071012;
+            --sidebar-bg-end:#022233;
+            --sidebar-accent:#ffd166;
+            --content-bg:#0f1720;
+            --text-color:#e9eef6;
+            --muted:#9aa6b2;
+            --card-bg:#14202a;
         }
 
-        @media screen{
-            body{
-                background-image:url('./images/Index_BG(2).png') !important;
-                background-size:cover;
-                background-repeat:no-repeat;
-                background-position:center center;
-                backdrop-filter: brightness(0.7);
-            }
-        }
-        main{
+        html,body{
             height:100%;
+            margin:0;
+            padding:0;
+            font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background:var(--content-bg);
+            color:var(--text-color);
+        }
+
+        /* Sidebar: fixed, full height, non-scrollable */
+        .app-sidebar{
+            position:fixed;
+            left:0;
+            top:0;
+            bottom:0;
+            width:var(--sidebar-width);
+            background: linear-gradient(180deg, var(--sidebar-bg-start), var(--sidebar-bg-end));
+            color:var(--link-color);
+            overflow:hidden; /* non-scrollable as requested */
             display:flex;
-            flex-flow:column;
+            flex-direction:column;
+            align-items:center;
+            padding:1.25rem 0.75rem;
+            box-shadow: 2px 0 20px rgba(2,24,40,0.35);
+            z-index:1030;
         }
+        /* Big centered logo area */
+        .sidebar-header{
+            width:100%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            flex-direction:column;
+            gap:.5rem;
+            padding: .5rem 0 1.25rem;
+        }
+        .sidebar-logo{
+            width: 160px;
+            height: auto;
+            object-fit: contain;
+            border-radius:12px;
+            transition: transform .22s ease, box-shadow .22s ease;
+        }
+        .sidebar-header .brand-title{
+            font-weight:800;
+            color:var(--link-color);
+            letter-spacing:.6px;
+            font-size:1.05rem;
+            display:block;
+            margin-top:6px;
+        }
+
+        /* Nav list - vertical and spread */
+        .sidebar-nav{
+            width:100%;
+            display:flex;
+            flex-direction:column;
+            gap:10px;
+            flex:1 1 auto;
+            justify-content:flex-start;
+            padding:0 8px;
+        }
+        .sidebar-nav a{
+            display:flex;
+            align-items:center;
+            gap:.8rem;
+            padding:.9rem .9rem;
+            border-radius:10px;
+            text-decoration:none;
+            color:var(--link-color);
+            font-weight:600;
+            transition: all .18s ease;
+            background:transparent;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+        }
+        .sidebar-nav a i{ min-width:26px; text-align:center; font-size:1.05rem; color:var(--link-color); }
+
+        .sidebar-nav a:hover{
+            transform: translateX(4px);
+            background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+            color:#fff;
+            box-shadow: 0 8px 24px rgba(2,24,40,0.35);
+        }
+        .sidebar-nav a.active{
+            color: var(--text-color);
+            background: linear-gradient(90deg, rgba(255,255,255,0.92), rgba(255,255,255,0.78));
+            box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+            transform: translateX(4px);
+        }
+        .sidebar-nav a.active i{ color: var(--sidebar-accent); }
+
+        /* Optional small buttons group under logo */
+        .sidebar-actions{
+            width:100%;
+            display:flex;
+            flex-direction:column;
+            gap:.5rem;
+            padding: .5rem 8px 1rem;
+        }
+        .sidebar-actions .btn{
+            width:100%;
+            border-radius:8px;
+            padding:.55rem .6rem;
+            font-weight:700;
+        }
+
+        /* content area sits to the right of sidebar and scrolls */
         #page-container{
-            flex: 1 1 auto; 
-            overflow:auto;
+            margin-left:var(--sidebar-width);
+            padding:1.75rem;
+            min-height:100vh;
+            box-sizing:border-box;
         }
-        #topNavBar{
-            flex: 0 1 auto; 
+
+        /* keep bootstrap modal, cards readable in dark mode */
+        .card{
+            background:var(--card-bg) !important;
+            color:var(--text-color) !important;
         }
+        .navbar, .custom-navbar { background:transparent; box-shadow:none; }
+
+        /* small screens: sidebar collapses to top bar */
+        @media (max-width: 767.98px){
+            .app-sidebar{
+                position:relative;
+                width:100%;
+                height:auto;
+                flex-direction:row;
+                align-items:center;
+                padding:.5rem;
+            }
+            .sidebar-header{ flex-direction:row; gap:.5rem; height:auto; padding:0; }
+            .sidebar-logo{ width:120px; }
+            #page-container{ margin-left:0; padding:.75rem; }
+            .sidebar-nav{ flex-direction:row; gap:.5rem; overflow-x:auto; padding: .5rem 0; }
+            .sidebar-nav a{ white-space:nowrap; padding:.5rem .7rem; border-radius:6px; }
+            .sidebar-actions{ display:none; }
+        }
+
+        /* scrollbar styles for content only */
+        #page-container::-webkit-scrollbar{ width:9px; }
+        #page-container::-webkit-scrollbar-thumb{ background: rgba(0,0,0,0.18); border-radius:8px; }
+
+        /* preserve some existing helper styles from original for compatibility */
         .thumbnail-img{
             width:50px;
             height:50px;
@@ -90,6 +215,12 @@ if($_SESSION['type'] != 1 && in_array($page,array('maintenance','products','stoc
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
         }
+        .modal-priority {
+            z-index: 1050;
+        }
+        .modal-dialog {
+            max-width: 800px; 
+        }
         .modal-dialog.large {
             width: 80% !important;
             max-width: unset;
@@ -108,89 +239,13 @@ if($_SESSION['type'] != 1 && in_array($page,array('maintenance','products','stoc
                 max-width: unset;
             }  
         }
-        .display-select-image{
-            width:60px;
-            height:60px;
-            margin:2px
-        }
         img.display-image {
             width: 100%;
             height: 45vh;
             object-fit: cover;
             background: black;
         }
-        /* width */
-        ::-webkit-scrollbar {
-        width: 5px;
-        }
-
-        /* Track */
-        ::-webkit-scrollbar-track {
-        background: #f1f1f1; 
-        }
-        
-        /* Handle */
-        ::-webkit-scrollbar-thumb {
-        background: #898; 
-        }
-
-        /* Handle on hover */
-        ::-webkit-scrollbar-thumb:hover {
-        background: #555; 
-        }
-        .img-del-btn{
-            right: 2px;
-            top: -3px;
-        }
-        .img-del-btn>.btn{
-            font-size: 10px;
-            padding: 0px 2px !important;
-        }
-
-        #plist .item.disabled {
-        cursor: not-allowed;
-        background-color: #f8d7da;
-        }
-        .disabled {
-        pointer-events: none;
-        opacity: 0.6;
-        }
-        .custom-navbar {
-        background: linear-gradient(0deg, #707070, #9c4b4b); 
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        padding: 10px 0; 
-        opacity: 80%;
-        z-index: 1000;
-        }
-
-        .custom-navbar .navbar-nav .nav-link {
-            color: #ffffff; 
-            font-weight: bold;
-            transition: all 0.5s ease;
-        }
-
-        .custom-navbar .navbar-nav .nav-link:hover {
-            color: #ff00ff; 
-        }
-
-        .dark-mode .card.rounded-0.shadow {
-            background-color: #444; /* Dark background for cards */
-            color: #fff; /* Text color for cards in dark mode */
-            opacity: 90%;
-        }
-
-        .dark-mode .table tbody tr:nth-child(odd) {
-            background-color: #555; /* Dark background for odd rows */
-            color: #ff0; /* Text color for odd rows in dark mode */
-            /* opacity: 90%; */
-        }
-
-        .dark-mode .table tbody tr:nth-child(even) {
-            background-color: #666; /* Dark background for even rows */
-            color: #fff; /* Text color for even rows in dark mode */
-            opacity: 90%;
-        }
-        
+        /* small tweaks for badges used */
         .badge-available {
             background-color: #28a745; 
             color: #ffffff; 
@@ -209,81 +264,50 @@ if($_SESSION['type'] != 1 && in_array($page,array('maintenance','products','stoc
 </head>
 <body>
     <main>
-    <nav class="navbar navbar-expand-lg navbar-light custom-navbar">
-    <div class="container">
-        <a class="navbar-brand" href="./">
-            <img src="./images/tiny_logo.png" width="150" height="60"/> 
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link <?php echo ($page == 'home')? 'active' : '' ?>" aria-current="page" href="./?page=home">
-                        <i class="fa fa-home"></i> Home
-                    </a>
-                </li>
-                <?php if($_SESSION['type'] == 1): ?>
-                <li class="nav-item">
-                    <a class="nav-link <?php echo ($page == 'products')? 'active' : '' ?>" href="./?page=products">
-                        <i class="fa fa-shopping-cart"></i> Products
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <?php echo ($page == 'stocks')? 'active' : '' ?>" href="./?page=stocks">
-                        <i class="fa fa-cube"></i> Stocks
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <?php echo ($page == 'users')? 'active' : '' ?>" href="./?page=users">
-                        <i class="fa fa-users"></i> Users
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <?php echo ($page == 'maintenance')? 'active' : '' ?>" href="./?page=maintenance">
-                        <i class="fa fa-wrench"></i> Maintenance
-                    </a>
-                </li>
-                <?php endif; ?>
-                <?php if (in_array($_SESSION['type'], [1, 0, NULL])): ?>
-                <li class="nav-item">
-                    <a class="nav-link <?php echo ($page == 'manage_shifts')? 'active' : '' ?>" href="./?page=manage_shifts">
-                        <i class="fa fa-clock"></i> Shift
-                    </a>
-                </li>
-                <?php endif; ?>
-                <li class="nav-item">
-                    <a class="nav-link <?php echo ($page == 'sales')? 'active' : '' ?>" href="./?page=sales">
-                        <i class="fa fa-dollar-sign"></i> POS
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <?php echo ($page == 'sales_report')? 'active' : '' ?>" href="./?page=sales_report">
-                        <i class="fa fa-chart-bar"></i> Sales
-                    </a>
-                </li>
-            </ul>
-            <div class="form-check form-switch ms-auto">
-                <input class="form-check-input" type="checkbox" id="darkModeToggle">
-                <label class="form-check-label" for="darkModeToggle"><i id="darkModeIcon" class="fa fa-sun"></i></label>
+    <!-- replace top nav with fixed left sidebar -->
+    <aside class="app-sidebar" aria-label="Main navigation">
+        <div class="sidebar-header">
+            <a href="./" class="d-block text-center" style="width:100%;">
+                <img src="./images/tiny_logo.png" alt="Julie's" class="sidebar-logo">
+            </a>
+            <span class="brand-title">Julie's Bakery</span>
+        </div>
+
+        <nav class="sidebar-nav" role="navigation">
+            <a class="<?php echo ($page == 'home')? 'active' : '' ?>" href="./?page=home"><i class="fa fa-home"></i> Home</a>
+            <?php if($_SESSION['type'] == 1): ?>
+            <a class="<?php echo ($page == 'products')? 'active' : '' ?>" href="./?page=products"><i class="fa fa-shopping-cart"></i> Products</a>
+            <a class="<?php echo ($page == 'stocks')? 'active' : '' ?>" href="./?page=stocks"><i class="fa fa-cube"></i> Stocks</a>
+            <a class="<?php echo ($page == 'users')? 'active' : '' ?>" href="./?page=users"><i class="fa fa-users"></i> Users</a>
+            <a class="<?php echo ($page == 'maintenance')? 'active' : '' ?>" href="./?page=maintenance"><i class="fa fa-wrench"></i> Maintenance</a>
+            <?php endif; ?>
+            <?php if (in_array($_SESSION['type'], [1, 0, NULL])): ?>
+            <a class="<?php echo ($page == 'manage_shifts')? 'active' : '' ?>" href="./?page=manage_shifts"><i class="fa fa-clock"></i> Shift</a>
+            <?php endif; ?>
+            <a class="<?php echo ($page == 'sales')? 'active' : '' ?>" href="./?page=sales"><i class="fa fa-dollar-sign"></i> POS</a>
+            <a class="<?php echo ($page == 'sales_report')? 'active' : '' ?>" href="./?page=sales_report"><i class="fa fa-chart-bar"></i> Sales</a>
+        </nav>
+
+        <div class="sidebar-actions">
+            <div class="form-check form-switch d-flex align-items-center justify-content-between">
+                <label class="form-check-label" for="darkModeToggleSmall">Dark</label>
+                <input class="form-check-input" type="checkbox" id="darkModeToggleSmall">
+            </div>
+            <div class="text-center">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-light dropdown-toggle w-100" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                        Hello <?php echo $_SESSION['fullname'] ?>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                        <li><a class="dropdown-item" href="./?page=manage_account">Manage Account</a></li>
+                        <li><a class="dropdown-item" href="./Actions.php?a=logout">Logout</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
-        <div>
-            <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle bg-transparent text-light border-0" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                    Hello <?php echo $_SESSION['fullname'] ?>
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                    <li><a class="dropdown-item" href="./?page=manage_account">Manage Account</a></li>
-                    <li><a class="dropdown-item" href="./Actions.php?a=logout">Logout</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</nav>
+    </aside>
     
-    <div class="container py-3" id="page-container">
+    <div id="page-container">
         <?php 
             if(isset($_SESSION['flashdata'])):
         ?>
@@ -344,53 +368,33 @@ if($_SESSION['type'] != 1 && in_array($page,array('maintenance','products','stoc
         </div>
         </div>
     </div>
+
 <script>
-    function toggleDarkMode() {
-        const container = document.querySelector('.container.py-3');
-        const cards = document.querySelectorAll('.card.rounded-0.shadow');
-        const icon = document.getElementById('darkModeIcon');
-        const toggleButton = document.getElementById('darkModeToggle');
+    // dark mode control: toggles class on body so CSS variables change globally
+    (function(){
+        const smallToggle = document.getElementById('darkModeToggleSmall');
+        const saved = localStorage.getItem('darkMode') === 'true';
+        if(saved) document.body.classList.add('dark-mode');
+        if(smallToggle) smallToggle.checked = saved;
 
-        container.classList.toggle('dark-mode');
-        cards.forEach(card => card.classList.toggle('dark-mode'));
-
-        // Adjust icon based on dark mode state
-        if (container.classList.contains('dark-mode')) {
-            icon.classList.remove('fa-moon');
-            icon.classList.add('fa-sun');
-            toggleButton.checked = true; // Check the toggle button
-        } else {
-            icon.classList.remove('fa-sun');
-            icon.classList.add('fa-moon');
-            toggleButton.checked = false; // Uncheck the toggle button
+        function toggle(e){
+            const on = e ? e.target.checked : !document.body.classList.contains('dark-mode');
+            document.body.classList.toggle('dark-mode', on);
+            localStorage.setItem('darkMode', on);
+            // update any other switches if present
+            const other = document.getElementById('darkModeToggle');
+            if(other) other.checked = on;
         }
 
-        // Save the user's preference in local storage
-        localStorage.setItem('darkMode', container.classList.contains('dark-mode'));
-    }
+        if(smallToggle) smallToggle.addEventListener('change', toggle);
 
-    // Set the initial mode based on user preference from local storage
-    document.addEventListener('DOMContentLoaded', function () {
-        const darkModePreference = localStorage.getItem('darkMode');
-        const container = document.querySelector('.container.py-3');
-        const icon = document.getElementById('darkModeIcon');
-        const cards = document.querySelectorAll('.card.rounded-0.shadow');
-        const toggleButton = document.getElementById('darkModeToggle');
-
-        if (darkModePreference === 'true') {
-            container.classList.add('dark-mode');
-            cards.forEach(card => card.classList.add('dark-mode'));
-            icon.classList.remove('fa-moon');
-            icon.classList.add('fa-sun');
-            toggleButton.checked = true; // Set the checkbox to checked
-        } else {
-            toggleButton.checked = false; // Set the checkbox to unchecked
+        // keep legacy toggle if present on page
+        const legacy = document.getElementById('darkModeToggle');
+        if(legacy) {
+            legacy.checked = saved;
+            legacy.addEventListener('change', toggle);
         }
-
-        // Attach the toggle event listener to the button
-        toggleButton.addEventListener('change', toggleDarkMode); // Use 'change' event to capture toggle state
-    });
+    })();
 </script>
-
 </body>
 </html>

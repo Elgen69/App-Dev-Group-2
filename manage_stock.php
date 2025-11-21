@@ -45,55 +45,41 @@ $qry = $conn->query("SELECT * FROM `stock_list` where stock_id = '{$_GET['id']}'
 </div>
 
 <script>
-    $(function(){
-        $('#stock-form').submit(function(e){
-            e.preventDefault();
-            $('.pop_msg').remove()
-            var _this = $(this)
-            var _el = $('<div>')
-                _el.addClass('pop_msg')
-            $('#uni_modal button').attr('disabled',true)
-            $('#uni_modal button[type="submit"]').text('submitting form...')
-            $.ajax({
-                url:'./Actions.php?a=save_stock',
-                data: new FormData($(this)[0]),
-                cache: false,
-                contentType: false,
-                processData: false,
-                method: 'POST',
-                type: 'POST',
-                dataType: 'json',
-                error:err=>{
-                    console.log(err)
-                    _el.addClass('alert alert-danger')
-                    _el.text("An error occurred.")
-                    _this.prepend(_el)
-                    _el.show('slow')
-                     $('#uni_modal button').attr('disabled',false)
-                     $('#uni_modal button[type="submit"]').text('Save')
-                },
-                success:function(resp){
-                    if(resp.status == 'success'){
-                        _el.addClass('alert alert-success')
-                        $('#uni_modal').on('hide.bs.modal',function(){
-                            location.reload()
-                        })
-                        if("<?php echo isset($product_id) ?>" != 1){
-                            _this.get(0).reset();
-                            $('.select2').val('').trigger('change')
-                        }
-                    }else{
-                        _el.addClass('alert alert-danger')
-                    }
-                    _el.text(resp.msg)
+$(function(){
+  $('#stock-form').submit(function(e){
+    e.preventDefault();
+    $('.pop_msg').remove();
+    var $f = $(this), el = $('<div>').addClass('pop_msg');
+    var $btn = $('#uni_modal button[type="submit"]');
 
-                    _el.hide()
-                    _this.prepend(_el)
-                    _el.show('slow')
-                     $('#uni_modal button').attr('disabled',false)
-                     $('#uni_modal button[type="submit"]').text('Save')
-                }
-            })
-        })
-    })
+    var pid = $f.find('[name="product_id"]').val() || $f.find('[name="pid"]').val();
+    var qty = parseFloat($f.find('[name="quantity"]').val());
+    var expiry = $f.find('[name="expiry_date"]').val();
+
+    if(!pid){ el.addClass('alert alert-danger').text('Product is required.'); $f.prepend(el); return; }
+    if(isNaN(qty) || qty <= 0){ el.addClass('alert alert-danger').text('Quantity must be greater than 0.'); $f.prepend(el); return; }
+    if(!expiry){ el.addClass('alert alert-danger').text('Expiry date is required.'); $f.prepend(el); return; }
+
+    $btn.attr('disabled', true).text('Submitting...');
+    $.ajax({
+      url:'./Actions.php?a=save_stock',
+      data: new FormData($f[0]),
+      cache: false,
+      contentType: false,
+      processData: false,
+      method:'POST',
+      dataType:'json'
+    }).done(function(resp){
+      if(resp && resp.status == 'success'){
+        el.addClass('alert alert-success').text(resp.msg || 'Stock saved');
+        $f.prepend(el);
+        setTimeout(function(){ location.reload(); }, 500);
+      } else {
+        el.addClass('alert alert-danger').text(resp && resp.msg ? resp.msg : 'Save failed'); $f.prepend(el);
+      }
+    }).fail(function(){ el.addClass('alert alert-danger').text('Server error'); $f.prepend(el); })
+    .always(function(){ $btn.attr('disabled', false).text('Save'); });
+
+  });
+});
 </script>

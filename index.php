@@ -290,7 +290,7 @@ if($_SESSION['type'] != 1 && in_array($page,array('maintenance','products','stoc
 
         <div class="sidebar-actions">
             <div class="form-check form-switch d-flex align-items-center justify-content-between">
-                <label class="form-check-label" for="darkModeToggleSmall">Dark</label>
+                <label class="form-check-label" for="darkModeToggleSmall">Dark Mode</label>
                 <input class="form-check-input" type="checkbox" id="darkModeToggleSmall">
             </div>
             <div class="text-center">

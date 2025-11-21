@@ -151,156 +151,155 @@
 </div>
 
 <script>
-    $(function(){
-        $('#search').on('input',function(){
-            var _search = $(this).val().toLowerCase()
-            $('#plist tbody tr').each(function(){
-                var _text = $(this).text().toLowerCase()
-                if(_text.includes(_search) === true){
-                    $(this).toggle(true)
-                }else{
-                    $(this).toggle(false)
-                }
-            })
-        })
-        $('#plist tbody tr').click(function(){
-            var qty = parseInt($(this).find('.qty').text()); // Get quantity
-            if (qty === 0) {
-                // If quantity is 0, do not allow selection
-                return false;
-            }
-            var _tr = $(this);
-            var pid = _tr.attr('data-id')
-            var cname = _tr.find('.cname').text()
-            var pcode = _tr.find('.pcode').text()
-            var name = _tr.find('.name').text()
-            var price = _tr.find('.price').text().replace(/,/gi,'')
-            var max = _tr.find('.qty').text()
-            var qty = 1
-            if($('#item-list tbody tr[data-id="'+pid+'"]').length > 0){
-                qty += parseFloat($('#item-list tbody tr[data-id="'+pid+'"]').find('[name="quantity[]"]').val())
-                $('#item-list tbody tr[data-id="'+pid+'"]').find('[name="quantity[]"]').val(qty).trigger('keydown')
-                return false;
-            }
-            var ntr  = $("<tr tabindex='0'>")
-                ntr.attr('data-id',pid)
-                ntr.append('<td class="py-0 px-1 align-middle"><input class="w-100 text-center" type="number" name="quantity[]" min="1" value="'+qty+'"/>'+
-                        '<input type="hidden" name="product_id[]" value="'+pid+'"/>'+
-                        '<input type="hidden" name="price[]" value="'+price+'"/>'+
-                '</td>')
-                ntr.append('<td class="py-0 px-1 align-middle"><div class="fs-6 mb-0 lh-1">'+pcode+'<br/>'+
-                            '<span class="name">'+name+'</span></br>'+
-                            '(<span class="price">'+parseFloat(price).toLocaleString('en-US',{style:'decimal',maximumFractionDigits:2})+'</span>)</div>'+
-                            '</td>');
-            ntr.append('<td class="py-0 px-1 align-middle text-end total">'+parseFloat(price).toLocaleString('en-US',{style:'decimal',maximumFractionDigits:2})+'</td>')
-            $('#item-list tbody').append(ntr)
-            compute(ntr)
-            calculate_total()
-        })
+$(function(){
+  $('#search').on('input', function(){
+    var _search = $(this).val().toLowerCase();
+    $('#plist tbody tr').each(function(){
+      var _text = $(this).text().toLowerCase();
+      $(this).toggle(_text.includes(_search));
+    });
+  });
 
-        $('#transaction-save-btn').click(function(){
-            if($('#item-list tbody tr').length <= 0){
-                alert("Please add atleast 1 item first.")
-                return false;
-            }
-            uni_modal("Payment","tender_amount.php?amount="+$('[name="total"]').val())
-        })
-        $('#transaction-form').submit(function(e){
-            e.preventDefault()
-            $('#transaction-save-btn').attr('disabled',true)
-            $('.pop_msg').remove()
-            var _this = $(this)
-            var _el = $('<div>')
-                _el.addClass('pop_msg')
-            $.ajax({
-                url:'./Actions.php?a=save_transaction',
-                data: new FormData($(this)[0]),
-                cache: false,
-                contentType: false,
-                processData: false,
-                method: 'POST',
-                type: 'POST',
-                dataType: 'json',
-                error:err=>{
-                    console.log(err)
-                    _el.addClass('alert alert-danger')
-                    _el.text("An error occurred.")
-                    _this.prepend(_el)
-                    _el.show('slow')
-                    $('#transaction-save-btn').attr('disabled',false)
-                },
-                success:function(resp){
-                    if(resp.status == 'success'){
-                        setTimeout(() => {
-                            uni_modal("RECEIPT","view_receipt.php?id="+resp.transaction_id)
-                        }, 1000);
-                    }else{
-                        _el.addClass('alert alert-danger')
-                    }
-                    _el.text(resp.msg)
+  // helper to parse numeric text
+  function parseNum(s){
+    s = (s || '').toString().replace(/,/g,'');
+    return isNaN(parseFloat(s)) ? 0 : parseFloat(s);
+  }
 
-                    _el.hide()
-                    _this.prepend(_el)
-                    _el.show('slow')
-                    $('#transaction-save-btn').attr('disabled',false)
-                }
-            })
-        })
-        $('#transaction-form input').keydown(function(e){
-            if(e.which == 13){
-            e.preventDefault()
-            return false
-            }
-        })
-    })
-    function compute(_this){
-        _this.find('[name="quantity[]"]').on('input keydown',function(){
-            var qty = $(this).val() > 0 ? $(this).val() : 0;
-            var price = _this.find('[name="price[]"]').val()
-            var _total = parseFloat(qty) * parseFloat(price)
-
-            _this.find('.total').text(parseFloat(_total).toLocaleString('en-US',{style:'decimal',maximumFractionDigits:2}))
-            calculate_total()
-        })
-        _this.find('[name="quantity[]"]').on('focusout',function(){
-            if($(this).val() <= 0){
-                $(this).val('0')
-            }
-        })
-        _this.on('focusin',function(){
-            $(this).addClass("bg-primary bg-opacity-50 selected-item")
-            $('#remove-item').attr('disabled',false)
-        })
-        _this.on('focusout',function(){
-            if($('#remove-item').is(':focus') == true || $('#remove-item').is(':hover') == true)
-            return false;
-            $(this).removeClass("bg-primary bg-opacity-50 selected-item")
-            $('#remove-item').attr('disabled',true)
-        })
-        $('#transaction-form input').keydown(function(e){
-            if(e.which == 13){
-            e.preventDefault()
-            return false
-            }
-        })
+  // on product click: check available and existing items
+  $('#plist tbody').on('click','tr', function(){
+    var $tr = $(this);
+    var pid = $tr.data('id');
+    var available = parseInt($tr.find('.qty').text()) || 0;
+    if(available <= 0){
+      alert('Out of stock');
+      return;
     }
-    function calculate_total(){
-        var sub = 0
-        var total = 0
-        var discount = 0
-        $('#item-list tr .total').each(function(){
-            val = $(this).text().replace(/,/gi,'')
-            sub += parseFloat(val)
-        })
-        $('[name="total"]').val(parseFloat(sub))
-        $('#total').text(parseFloat(sub).toLocaleString('en-US',{style:'decimal',manimumFractionDigits:2,maximumFractionDigits:2}))
-        $('#subTotal').text(parseFloat(sub).toLocaleString('en-US',{style:'decimal',manimumFractionDigits:2,maximumFractionDigits:2}))
-        discount = sub * .05;
-        $('#tax').text(parseFloat(discount).toLocaleString('en-US',{style:'decimal',manimumFractionDigits:2,maximumFractionDigits:2}))
+    // current quantity already in cart for this pid
+    var $existing = $('#item-list tbody tr[data-id="'+pid+'"]');
+    var currentInCart = 0;
+    if($existing.length){
+      currentInCart = parseInt($existing.find('[name="quantity[]"]').val()) || 0;
     }
-    function remove_item(){
-        $('#item-list tr.selected-item').remove()
-        calculate_total()
-        $('#remove-item').attr('disabled',true)
-        }
+
+    // If already at max, refuse to add more
+    if(currentInCart >= available){
+      alert('Cannot add more than available stock ('+available+')');
+      return;
+    }
+
+    // If exists, increment by 1 (but cap at available)
+    if($existing.length){
+      var newQty = currentInCart + 1;
+      if(newQty > available) newQty = available;
+      $existing.find('[name="quantity[]"]').val(newQty).trigger('input');
+      return;
+    }
+
+    // create new item row with quantity 1
+    var pcode = $tr.find('.pcode').text();
+    var name = $tr.find('.name').text();
+    var price = parseNum($tr.find('.price').text());
+    var qty = 1;
+
+    var ntr = $("<tr tabindex='0'>").attr('data-id', pid);
+    ntr.append('<td class="py-0 px-1 align-middle"><input class="w-100 text-center quantity-input" type="number" name="quantity[]" min="1" value="'+qty+'" max="'+available+'"/>'+
+               '<input type="hidden" name="product_id[]" value="'+pid+'"/>'+
+               '<input type="hidden" name="price[]" value="'+price+'"/></td>');
+    ntr.append('<td class="py-0 px-1 align-middle"><div class="fs-6 mb-0 lh-1">'+pcode+'<br/><span class="name">'+name+'</span><br/>(<span class="price">'+price.toLocaleString()+'</span>)</div></td>');
+    ntr.append('<td class="py-0 px-1 align-middle text-end total">'+(price*qty).toLocaleString()+'</td>');
+    $('#item-list tbody').append(ntr);
+    compute(ntr);
+    calculate_total();
+  });
+
+  // compute() updated to enforce max by reading available quantity from product list row
+  function compute($row){
+    $row.find('[name="quantity[]"]').on('input change', function(){
+      var $input = $(this);
+      var newQty = parseInt($input.val()) || 0;
+      if (newQty < 0) newQty = 0;
+      // find product id
+      var pid = $row.data('id');
+      // find available from product list row
+      var available = parseInt($('#plist tbody tr[data-id="'+pid+'"]').find('.qty').text()) || 0;
+      if(newQty > available){
+        newQty = available;
+        $input.val(newQty);
+        alert('Reached max available: '+available);
+      }
+      var price = parseNum($row.find('[name="price[]"]').val());
+      var total = parseFloat(newQty) * parseFloat(price);
+      $row.find('.total').text(parseFloat(total || 0).toLocaleString());
+      calculate_total();
+    });
+
+    $row.on('focusin', function(){
+      $(this).addClass("bg-primary bg-opacity-50 selected-item");
+      $('#remove-item').attr('disabled', false);
+    });
+    $row.on('focusout', function(){
+      if($('#remove-item').is(':focus') || $('#remove-item').is(':hover')) return;
+      $(this).removeClass("bg-primary bg-opacity-50 selected-item");
+      $('#remove-item').attr('disabled', true);
+    });
+  }
+
+  // remove item button
+  $('#remove-item').on('click', function(){
+    $('#item-list tr.selected-item').remove();
+    calculate_total();
+    $('#remove-item').attr('disabled', true);
+  });
+
+  $('#transaction-save-btn').click(function(){
+    if($('#item-list tbody tr').length <= 0){
+      alert("Please add at least 1 item.");
+      return false;
+    }
+    // before opening payment, final validation: ensure none of the requested qty exceed availability
+    var ok = true;
+    $('#item-list tbody tr').each(function(){
+      var pid = $(this).data('id');
+      var want = parseInt($(this).find('[name="quantity[]"]').val()) || 0;
+      var avail = parseInt($('#plist tbody tr[data-id="'+pid+'"]').find('.qty').text()) || 0;
+      if(want <= 0){ ok = false; alert('Quantity must be > 0'); return false; }
+      if(want > avail){ ok = false; alert('Requested more than available for product ID '+pid); return false; }
+    });
+    if(!ok) return false;
+
+    uni_modal("Payment","tender_amount.php?amount="+$('[name="total"]').val());
+  });
+
+  // form submit remains same: do server-side check as well
+  $('#transaction-form').submit(function(e){
+    e.preventDefault();
+    var $btn = $('#transaction-save-btn');
+    $btn.attr('disabled',true);
+    $('.pop_msg').remove();
+    var _this = $(this);
+    var _el = $('<div>').addClass('pop_msg');
+
+    $.ajax({
+      url:'./Actions.php?a=save_transaction',
+      data: new FormData(_this[0]),
+      cache: false,
+      contentType: false,
+      processData: false,
+      method: 'POST',
+      dataType: 'json'
+    }).done(function(resp){
+      if(resp && resp.status == 'success'){
+        setTimeout(function(){ uni_modal("RECEIPT","view_receipt.php?id="+resp.transaction_id); }, 1000);
+      } else {
+        _el.addClass('alert alert-danger').text(resp && resp.msg ? resp.msg : 'Save failed'); _this.prepend(_el);
+      }
+    }).fail(function(){ _el.addClass('alert alert-danger').text('Server error'); _this.prepend(_el); })
+    .always(function(){ $btn.attr('disabled', false); });
+  });
+
+  // disable Enter default in form
+  $('#transaction-form input').keydown(function(e){ if(e.which == 13){ e.preventDefault(); return false; } });
+
+});
 </script>

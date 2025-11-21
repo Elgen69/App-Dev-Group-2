@@ -28,7 +28,7 @@ body::before {
   height: 100%;
   background: url('images/Login_blur.jpg') no-repeat center center;
   background-size: cover;
-  opacity: 0.;
+  opacity: 0.3;
   z-index: -1;
 }
 
@@ -225,9 +225,12 @@ $("#back-btn").click(()=>{
 $("#login-form").submit(function(e){
   e.preventDefault();
   $.post('./Actions.php?a=login', $(this).serialize(), function(resp){
+    console.log(resp); // Log the response for debugging
     if(resp.status==='success') location.href='./';
     else alert(resp.msg || 'Login failed');
-  },'json');
+  },'json').fail(function(jqXHR, textStatus, errorThrown) {
+    alert('Request failed: ' + textStatus + ', ' + errorThrown); // Handle request failure
+  });
 });
 
 // reset ajax

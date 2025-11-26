@@ -29,7 +29,7 @@
     position:absolute;
     inset:-2px;
     z-index:0;
-    background: linear-gradient(90deg, #00ffd1, #00bfff, #9b59b6, #ff7f50, #ffd700);
+    background: linear-gradient(90deg, #df9aa7ff, #af2f2fff, #7b0b23ff, #ff7f50, red);
     filter: blur(var(--glow-blur));
     opacity:var(--glow-opacity);
     transform: scale(1.02);

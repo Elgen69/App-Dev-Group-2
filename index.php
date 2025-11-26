@@ -31,15 +31,12 @@ if($_SESSION['type'] != 1 && in_array($page,array('maintenance','products','stoc
     <script src="./js/script.js"></script>
     <style>
         :root{
-            --sidebar-width:300px;
-            --sidebar-bg-start:#071428;
-            --sidebar-bg-end:#023047;
-            --sidebar-accent:#ffb703;
-            --content-bg:#f6f7fb;
-            --text-color:#0b1220;
-            --muted:#6c757d;
-            --link-color:#e6f2ff;
-            --card-bg:#ffffff;
+              --sidebar-width: 350px;
+    --radius: 12px;
+    --card-bg: rgba(255, 255, 255, 0.6);
+    --text-color: #000000ff;
+    --link-color: #a7a7a7ff;
+    --sidebar-glow: 0.35;
         }
         /* Dark mode variables */
         body.dark-mode{
@@ -52,32 +49,38 @@ if($_SESSION['type'] != 1 && in_array($page,array('maintenance','products','stoc
             --card-bg:#14202a;
         }
 
-        html,body{
-            height:100%;
-            margin:0;
-            padding:0;
-            font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background:var(--content-bg);
-            color:var(--text-color);
-        }
+        html, body {
+    height: 100%;
+    margin: 0;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    background: #fae4daff;
+    color: var(--text-color);
+    overflow-x: hidden;
+}
+#page-container {
+    margin-left: var(--sidebar-width);
+    padding: 1.75rem;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
 
         /* Sidebar: fixed, full height, non-scrollable */
-        .app-sidebar{
-            position:fixed;
-            left:0;
-            top:0;
-            bottom:0;
-            width:var(--sidebar-width);
-            background: linear-gradient(180deg, var(--sidebar-bg-start), var(--sidebar-bg-end));
-            color:var(--link-color);
-            overflow:hidden; /* non-scrollable as requested */
-            display:flex;
-            flex-direction:column;
-            align-items:center;
-            padding:1.25rem 0.75rem;
-            box-shadow: 2px 0 20px rgba(2,24,40,0.35);
-            z-index:1030;
-        }
+        .app-sidebar {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: var(--sidebar-width);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.25rem 0.75rem;
+    background: linear-gradient(180deg, #651010ff, #1b0000);
+    color: var(--link-color);
+    box-shadow: 6px 0 25px rgba(0,0,0,0.55), inset 0 0 25px rgba(255,0,0,0.12);
+    backdrop-filter: blur(20px) saturate(160%);
+    border-right: 1px solid rgba(255,0,0,0.12);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
         /* Big centered logo area */
         .sidebar-header{
             width:100%;
@@ -159,12 +162,7 @@ if($_SESSION['type'] != 1 && in_array($page,array('maintenance','products','stoc
         }
 
         /* content area sits to the right of sidebar and scrolls */
-        #page-container{
-            margin-left:var(--sidebar-width);
-            padding:1.75rem;
-            min-height:100vh;
-            box-sizing:border-box;
-        }
+        
 
         /* keep bootstrap modal, cards readable in dark mode */
         .card{
@@ -247,11 +245,11 @@ if($_SESSION['type'] != 1 && in_array($page,array('maintenance','products','stoc
         }
         /* small tweaks for badges used */
         .badge-available {
-            background-color: #28a745; 
+            background-color: #03943fff; 
             color: #ffffff; 
-            padding: 5px 10px;
-            border-radius: 12px;
-            font-size: 0.875rem;
+            padding: ;
+            border-radius: 1000px ;
+            font-size: 0.1rem;
         }
         .badge-unavailable {
             background-color: #dc3545; 

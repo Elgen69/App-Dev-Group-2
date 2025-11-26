@@ -50,16 +50,16 @@
                     <td class="py-0 px-1 text-center">
                         <?php 
                         if($row['status'] == 1){
-                            echo '<span class="py-1 px-3 badge-available"><small>Available</small></span>';
+                            echo '<span class="py-1 px-3 badge-available"><small></small></span>';
                         } else {
-                            echo '<span class="py-1 px-3 badge-unavailable"><small>Unavailable</small></span>';
+                            echo '<span class="py-1 px-3 badge-unavailable"><small></small></span>';
                         }
                         ?>  
                     </td>
                     <td class="text-center py-0 px-1">
                         <div class="btn-group" role="group">
                             <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle btn-sm rounded-0 py-0" data-bs-toggle="dropdown" aria-expanded="false">
-                            Action
+                            🖉
                             </button>
                             <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
                             <li><a class="dropdown-item view_data" data-id = '<?php echo $row['product_id'] ?>' href="javascript:void(0)">View Details</a></li>

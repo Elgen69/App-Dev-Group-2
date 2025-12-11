@@ -70,7 +70,7 @@
     <div class="card rounded-0 shadow">
         <div class="card-body">
             <h3 style="font-family: 'Pacifico', cursive; background: linear-gradient(145deg, #00ffbd, #00bfff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
-                Welcome to Julie's Bakery Shop Management System
+                Julie's Bakery Shop Management System
             </h3>
             <hr style="border-top: 1px solid rgba(0,0,0,0.1);">
             <div class="col-12">

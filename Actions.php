@@ -492,18 +492,29 @@ class Actions extends DBConnection {
                 $_SESSION['flashdata']['msg'] = "Transaction successfully saved.";
             else
                 $_SESSION['flashdata']['msg'] = "Transaction successfully updated.";
-            if(empty($id))
-            $last_id = $this->db->insert_id;
-                $tid = empty($id) ? $last_id : $id;
+            if(empty($id)){
+                $last_id = $this->db->insert_id;
+                if(empty($last_id) || $last_id == 0){
+                    // Fallback: if table doesn't have AUTO_INCREMENT, retrieve inserted id via receipt_no and user_id
+                    $res = $this->db->query("SELECT transaction_id FROM transaction_list WHERE receipt_no = '{$receipt_no}' AND user_id = '{$_SESSION['user_id']}' ORDER BY unix_timestamp(date_added) DESC LIMIT 1");
+                    if($res && $res->num_rows > 0){
+                        $last_id = $res->fetch_array()['transaction_id'];
+                    }
+                }
+                $tid = $last_id;
+            }else{
+                $tid = $id;
+            }
             $data ="";
             foreach($product_id as $k => $v){
                 if(!empty($data)) $data .=",";
                 $data .= "('{$tid}','{$v}','{$quantity[$k]}','{$price[$k]}')";
             }
-            if(!empty($data))
-            $this->db->query("DELETE FROM transaction_items where transaction_id = '{$tid}'");
-            $sql = "INSERT INTO transaction_items (`transaction_id`,`product_id`,`quantity`,`price`) VALUES {$data}";
-            $save = $this->db->query($sql);
+            if(!empty($data) && !empty($tid)){
+                $this->db->query("DELETE FROM transaction_items where transaction_id = '{$tid}'");
+                $sql = "INSERT INTO transaction_items (`transaction_id`,`product_id`,`quantity`,`price`) VALUES {$data}";
+                $save = $this->db->query($sql);
+            }
             $resp['transaction_id'] = $tid;
         }else{
             $resp['status']="failed";

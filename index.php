@@ -261,7 +261,51 @@ if($_SESSION['type'] != 1 && in_array($page,array('maintenance','products','stoc
             border-radius: 12px;
             font-size: 0.875rem;
         }
-    </style>
+        /* Dark mode text color for tables, empty rows and headers */
+        .bg-danger.bg-opacity-25,
+        thead tr,
+        .empty-message {
+            color: var(--text-color) !important;
+        }
+        /* DataTables controls (show entries, search, pagination) */
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_paginate {
+            color: var(--text-color) !important;
+        }
+        .dataTables_wrapper .dataTables_filter input,
+        .dataTables_wrapper .dataTables_length select {
+            background: var(--card-bg) !important;
+            color: var(--text-color) !important;
+            border-color: rgba(233, 233, 233, 0.48) !important;
+        }
+        /* Pagination buttons */
+        .dataTables_paginate .paginate_button {
+            color: var(--text-color) !important;
+            background: var(--card-bg) !important;
+            border-color: rgba(0, 0, 0, 1) !important;
+        }
+        .dataTables_paginate .paginate_button:hover {
+            background: rgba(214, 197, 197, 0.6) !important;
+            color: var(--text-color) !important;
+        }
+        .dataTables_paginate .paginate_button.active {
+            background: linear-gradient(135deg, #0066cc, #0052a3) !important;
+            color: #ffffff !important;
+            border-color: #0052a3 !important;
+        }
+        .dataTables_paginate .paginate_button.disabled {
+            opacity: 0.5;
+        }        /* Dark mode: light pagination buttons */
+        body.dark-mode .dataTables_paginate .paginate_button {
+            background: #2a3f5f !important;
+            color: #e9eef6 !important;
+            border-color: rgba(255,255,255,0.1) !important;
+        }
+        body.dark-mode .dataTables_paginate .paginate_button:hover {
+            background: #3a5070 !important;
+        }    </style>
 </head>
 <body>
     <main>

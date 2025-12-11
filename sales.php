@@ -31,7 +31,7 @@
                                 </div>
                             </div>
                             <div>
-                                <table class="table table-hover table-striped bg-light mb-0">
+                                <table class="table table-hover table-striped mb-0">
                                     <colgroup>
                                         <col width="25%">
                                         <col width="20%">
@@ -97,7 +97,7 @@
                                     </div>
                                     </div>
                                     <div>
-                                        <table class="table table-hover table-bordered table-striped bg-light m-0">
+                                        <table class="table table-hover table-bordered table-striped bg-secondary m-0">
                                             <colgroup>
                                                 <col width="20%">
                                                 <col width="65%">

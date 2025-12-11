@@ -162,7 +162,7 @@ $cashiers = get_cashiers($conn);
                 <div class="card-body p-2">
                     <div class="table-responsive" style="max-height:520px; overflow:auto;">
                         <table class="table table-sm table-hover mb-0 align-middle">
-                            <thead class="table-light sticky-top">
+                            <thead class="sticky-top">
                                 <tr>
                                     <th>#</th>
                                     <th>Date</th>
@@ -183,7 +183,7 @@ $cashiers = get_cashiers($conn);
                                     $i = 1;
                                     while($row = $list_qry->fetch_assoc()):
                                 ?>
-                                    <tr>
+                                    <tr class="bg-light">
                                         <td><?php echo $i++; ?></td>
                                         <td><?php echo e(date('Y-m-d', strtotime($row['shift_date']))); ?></td>
                                         <td><?php echo e($row['cashier']); ?></td>

@@ -245,6 +245,21 @@ $(function(){
     });
   }
 
+  // calculate totals (subtotal, tax, grand total)
+  function calculate_total(){
+    var subtotal = 0;
+    $('#item-list tbody tr').each(function(){
+      var totalText = $(this).find('.total').text();
+      subtotal += parseNum(totalText);
+    });
+    var tax = parseFloat(subtotal) * 0.05; // 5% tax
+    var grand_total = parseFloat(subtotal) + parseFloat(tax);
+    $('#subTotal').text(parseFloat(subtotal || 0).toLocaleString());
+    $('#tax').text(parseFloat(tax || 0).toLocaleString());
+    $('#total').text(parseFloat(grand_total || 0).toLocaleString());
+    $('[name="total"]').val(parseFloat(grand_total || 0));
+  }
+
   // remove item button
   $('#remove-item').on('click', function(){
     $('#item-list tr.selected-item').remove();

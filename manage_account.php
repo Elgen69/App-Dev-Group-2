@@ -46,54 +46,42 @@ foreach($qry->fetch_array() as $k => $v){
     </div>
 </div>
 <script>
-    // This function runs once the document is fully loaded
-    $(function(){
-        // Handle form submission for updating user credentials
-        $('#user-form').submit(function(e){
-            e.preventDefault(); // Prevent the default form submission behavior
-            $('.pop_msg').remove(); // Remove any existing pop-up messages
+$(function(){
+  $('#user-form').submit(function(e){
+    e.preventDefault();
+    $('.pop_msg').remove();
+    var $f = $(this);
+    var $btn = $('#uni_modal button[type="submit"]');
+    var el = $('<div>').addClass('pop_msg');
 
-            var _this = $(this); // Reference to the form
-            var _el = $('<div>'); // Create a new div element for the pop-up message
-            _el.addClass('pop_msg'); // Add a class to the div
+    // Basic checks
+    var username = $.trim($f.find('[name="username"]').val());
+    var fullname = $.trim($f.find('[name="fullname"]').val());
+    var password = $f.find('[name="password"]').val();
+    var confirm_password = $f.find('[name="confirm_password"]').val();
 
-            // Disable all buttons in the modal and change the submit button text to indicate form submission
-            $('#uni_modal button').attr('disabled',true);
-            $('#uni_modal button[type="submit"]').text('submitting form...');
+    if(!username){ el.addClass('alert alert-danger').text('Username is required.'); $f.prepend(el); return; }
+    if(!fullname){ el.addClass('alert alert-danger').text('Full name is required.'); $f.prepend(el); return; }
+    // if password is supplied, require confirm and length
+    if(password && password.length < 6){ el.addClass('alert alert-danger').text('Password must be at least 6 characters.'); $f.prepend(el); return; }
+    if(password && password !== confirm_password){ el.addClass('alert alert-danger').text('Password and confirm password do not match.'); $f.prepend(el); return; }
 
-            // Send an AJAX POST request to update the user credentials
-            $.ajax({
-                url:'./Actions.php?a=update_credentials', // URL for the update action
-                method:'POST', // HTTP method
-                data:$(this).serialize(), // Serialize the form data
-                dataType:'JSON', // Expected response data type
-                error:err=>{
-                    // Handle any errors that occur during the AJAX request
-                    console.log(err);
-                    _el.addClass('alert alert-danger'); // Add error classes to the div
-                    _el.text("An error occurred."); // Set the error message text
-                    _this.prepend(_el); // Prepend the error message to the form
-                    _el.show('slow'); // Show the error message
-                    // Re-enable the buttons and reset the submit button text
-                    $('#uni_modal button').attr('disabled',false);
-                    $('#uni_modal button[type="submit"]').text('Save');
-                },
-                success:function(resp){
-                    // Handle the successful response from the server
-                    if(resp.status == 'success'){
-                        location.reload(); // Reload the page if the update is successful
-                    } else {
-                        _el.addClass('alert alert-danger'); // Add error classes to the div
-                        _el.text(resp.msg); // Set the error message text
-                    }
-                    _el.hide(); // Hide the message initially
-                    _this.prepend(_el); // Prepend the message to the form
-                    _el.show('slow'); // Show the message
-                    // Re-enable the buttons and reset the submit button text
-                    $('#uni_modal button').attr('disabled',false);
-                    $('#uni_modal button[type="submit"]').text('Save');
-                }
-            });
-        });
-    });
+    $btn.attr('disabled',true).text('Submitting...');
+    $.ajax({
+      url:'./Actions.php?a=update_credentials',
+      method:'POST',
+      data:$f.serialize(),
+      dataType:'JSON'
+    }).done(function(resp){
+      if(resp && resp.status == 'success'){
+        location.reload();
+      } else {
+        el.addClass('alert alert-danger').text(resp && resp.msg ? resp.msg : 'Update failed');
+        $f.prepend(el);
+      }
+    }).fail(function(){ el.addClass('alert alert-danger').text('Server error'); $f.prepend(el); })
+    .always(function(){ $btn.attr('disabled', false).text('Save'); });
+
+  });
+});
 </script>

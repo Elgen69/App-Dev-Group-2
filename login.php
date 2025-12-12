@@ -17,302 +17,249 @@ require_once('DBConnection.php');
 $page = isset($_GET['page']) ? $_GET['page'] : 'home';
 ?>
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LOGIN | Julie's POS and Management System</title>
-    <link rel="stylesheet" href="./css/bootstrap.min.css">
-    <script src="./js/jquery-3.6.0.min.js"></script>
-    <script src="./js/popper.min.js"></script>
-    <script src="./js/bootstrap.min.js"></script>
-    <script src="./js/script.js"></script>
-    <style>
-        html, body {
-            height: 100%;
-        }
-        #loading-screen {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            background: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        #loading-gif {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; 
-        }
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('./images/Login_blur.jpg') !important;
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center center;
-            filter: blur(5px); 
-            z-index: -1; 
-        }
-        @keyframes glowing {
-            /* 0% {
-                text-shadow: 0 0 10px #FA8072, 0 0 20px #FA8072, 0 0 30px #FA8072, 0 0 40px #FA8072, 0 0 50px #FA8072, 0 0 60px #FA8072, 0 0 70px #FA8072, 0 0 80px #FA8072;
-            } */
-            /* 50% {
-                text-shadow: 0 0 20px #FA8072, 0 0 30px #FA8072, 0 0 40px #FA8072, 0 0 50px #FA8072, 0 0 60px #FA8072, 0 0 70px #FA8072, 0 0 80px #FA8072, 0 0 90px #FA8072;
-            } */
-            100% {
-                text-shadow: 0 0 10px #FA8072, 0 0 20px #FA8072, 0 0 30px #FA8072, 0 0 40px #FA8072, 0 0 50px #FA8072, 0 0 60px #FA8072, 0 0 70px #FA8072, 0 0 80px #FA8072;
-            }
-        }
-        #sys_title {
-            font-family: 'Pacifico', cursive;
-            color: #F9E2AF;
-            text-shadow: 2px 2px 4px rgba(0, 2, 3, 0.3);
-            padding: 5rem;
-            font-size: 6rem;
-            margin-bottom: 5;
-            animation: glowing 10s linear infinite;
-        }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>LOGIN | Julie's POS and Management System</title>
 
-        @media (max-width: 700px) {
-            #sys_title {
-                font-size: 3rem !important;
-            }
-        }
+<!-- local CSS/JS you already use (keep these if present in your project) -->
+<link rel="stylesheet" href="./css/bootstrap.min.css">
+<link rel="stylesheet" href="./Font-Awesome-master/css/all.min.css">
+<script src="./js/jquery-3.6.0.min.js"></script>
+<script src="./js/popper.min.js"></script>
+<script src="./js/bootstrap.min.js"></script>
 
-        .card-body {
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            background: linear-gradient(to right bottom, #d16ba5, #c777b9, #ba83ca, #aa8fd8, #9a9ae1, #8aa7ec, #79b3f4, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);
-            padding: 20px;
-            animation: glowing-border 5s ease-out infinite alternate;
-        }
+<style>
+/* PAGE RESET */
+html,body { height:100%; margin:0; font-family: "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
 
-        @keyframes glowing-border {
-            /* /* 0% {
-                box-shadow: 0 0 10px #F9E2AF, 0 0 20px #F9E2AF, 0 0 30px #F9E2AF, 0 0 40px #F9E2AF, 0 0 50px #F9E2AF;
-            } */
-            100% {
-                box-shadow: 0 0 20px #F9E2AF, 0 0 30px #F9E2AF, 0 0 40px #F9E2AF, 0 0 50px #F9E2AF, 0 0 60px #F9E2AF;
-            } */
-        }
+/* Full-screen loading overlay (kept for a slight loader) */
+#loading-screen{ position: fixed; inset: 0; width: 100vw; height: 100vh; display:flex; justify-content:center; align-items:center; background: rgba(255,255,255,0.95); z-index:99999; overflow:hidden; }
 
-        .form-control {
-            border-radius: 10px;
-            border: none;
-            background-color: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 12px;
-            transition: background-color 4s ease, box-shadow 4s ease;
-            font-size: 14px;
-        }
+/* container around the image to control sizing (keeps gif centered + scaled) */
+#loading-screen .loader-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(90vw, 900px);   /* responsive max width */
+  height: min(70vh, 560px);  /* responsive max height */
+  padding: 8px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  /* optional glow */
+  box-shadow: 0 10px 40px rgba(0,255,90,0.12), 0 2px 6px rgba(0,0,0,0.6);
+}
 
-        .form-control:focus {
-            outline: none;
-            background-color: rgba(255, 255, 255, 1);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
+#loading-gif {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+}
 
-        .btn-primary {
-            background-color: #86A8E7;
-            border: none;
-            border-radius: 10px;
-            padding: 10px 20px;
-            font-size: 14px;
-            transition: background-color 2s ease, transform 2s ease;
-        }
+/* full-bleed blurred background image (static) */
+.bg-photo { position:fixed; inset:0; background-image: url('./images/Login_blur.jpg'); background-size:cover; background-position:center; filter: blur(6px) saturate(1.05); transform: scale(1.02); z-index:0; }
 
-        .btn-primary:hover {
-            background-color: #FF4EAD;
-            transform: translateY(-2px);
-        }
+/* slight dark overlay to improve contrast */
+.bg-overlay { position:fixed; inset:0; background: rgba(0,0,0,0.18); z-index:1; }
 
-        .fancy-input {
-            font-family: 'Arial', sans-serif;
-            color: #333;
-        }
+/* matrix canvas removed */
+#matrix-canvas { display:none; }
 
-        .fancy-button {
-            font-family: 'Arial', sans-serif;
-            color: white;
-            font-weight: bold;
-            border-radius: 15px;
-        }
-    </style>
+/* brand title (simple centered) positioned between top and login card) */
+.header-title { position:fixed; left:0; right:0; top:30vh; z-index:3; text-align:center; font-family:'Pacifico', cursive; color: #ffffff; font-size:28px; line-height:1; -webkit-text-stroke: .6px rgba(0,0,0,0.6); text-shadow: 0 1px 2px rgba(0,0,0,0.6); pointer-events:none; }
+
+/* center area for card */
+.center-wrap { position:relative; z-index:4; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:1.5rem; }
+
+/* Decorative background removed to match other pages */
+:root{ --card-z: 4; --content-bg:#f6f7fb; --card-bg:#ffffff; --text-color:#0b1220; }
+
+.login-card, .card, .card-body, .card .card-body, #login-panel {
+  position: relative;
+  z-index: var(--card-z) !important;
+}
+
+
+/* login card */
+.login-card { width:420px; max-width:94vw; background: #023047; color: #ffffff; border-radius:12px; padding:1.2rem 1.3rem; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.06); position: relative; z-index: 4; }
+
+/* subtle inner */
+.login-card .card-inner { border-radius:8px; padding:10px; }
+
+/* small instructions */
+.login-card small { display:block; text-align:center; color:rgba(255,255,255,0.92); margin-bottom:.6rem; }
+
+/* inputs (scoped to login-card) */
+.login-card .form-control { border-radius:6px; background:#ffffff; color: #0b1220; border: 1px solid rgba(0,0,0,0.08); padding:10px 12px; font-size:14px; }
+label { color: rgba(0,0,0,0.75); font-weight:600; font-size:.85rem; }
+/* login card labels */
+.login-card label { color: rgba(255,255,255,0.92); }
+
+/* fancy buttons */
+.btn-primary { background: linear-gradient(90deg, #2d8a2d, #198a4b); border:none; color:white; font-weight:600; border-radius:8px; padding:8px 14px; }
+/* secondary button inside login card should be visible on the dark background */
+.login-card .btn-secondary { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.95); border: 1px solid rgba(255,255,255,0.06); border-radius:8px; }
+
+/* Forgot / login row */
+.actions-row { display:flex; gap:.5rem; justify-content:flex-end; margin-top:.6rem; }
+
+/* smaller faded footer note */
+.footer-note { font-size:12px; color:rgba(255,255,255,0.72); text-align:center; margin-top:10px; }
+
+/* forgot password card (hidden by default) - share same style */
+.forgot-wrap { display:none; width:420px; max-width:94vw; }
+
+/* RESPONSIVE */
+@media (max-width:540px){
+  .header-title { font-size:18px; top:20vh; }
+  .login-card { padding:.9rem; }
+}
+</style>
 </head>
-<body class="">
 
-    <div id="loading-screen">
-        <img id="loading-gif" src="./images/Julies Loading.gif" alt="Loading...">
-    </div>
+<div id="loading-screen">
+    <img id="loading-gif" src="./images/Julies Loading.gif" alt="Loading...">
+</div>
 
-    <div class="h-100 d-flex justify-content-center align-items-center">
-        <div class='w-100'>
-            <div class="rounded-border">
-                <h1 class="py-5 text-center text-light px-4" id="sys_title">Julie's POS and Management System</h1>
-            </div>
-            <div class="card my-3 col-md-4 offset-md-4">
-                <div class="card-body">
-                    <form action="" id="login-form">
-                        <center><small>Please enter your credentials.</small></center>
-                        <div class="form-group">
-                            <label for="username" class="control-label">Username</label>
-                            <input type="text" id="username" autofocus name="username" class="form-control form-control-sm rounded-0 fancy-input" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="password" class="control-label">Password</label>
-                            <input type="password" id="password" name="password" class="form-control form-control-sm rounded-0 fancy-input" required>
-                        </div>
-                        <div class="form-group d-flex justify-content-end">
-                            <button type="button" class="fancy-button btn btn-sm btn-secondary rounded-0 my-1" id="forgot-btn">Forgot Password?</button>
-                            <button type="submit" class="fancy-button btn btn-sm btn-primary rounded-0 my-1">Login</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-    <div id="forgot-form" style="display: none;">
-        <div class="card my-3 col-md-4 offset-md-4">
-            <div class="card-body">
-                <form action="" id="forgot-password-form">
-                    <div class="form-group">
-                        <label for="email" class="control-label">Email</label>
-                        <input type="email" id="email" name="email" class="form-control form-control-sm rounded-0 fancy-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="new_password" class="control-label">New Password</label>
-                        <input type="password" id="new_password" name="new_password" class="form-control form-control-sm rounded-0 fancy-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="confirm_password" class="control-label">Confirm Password</label>
-                        <input type="password" id="confirm_password" name="confirm_password" class="form-control form-control-sm rounded-0 fancy-input" required>
-                    </div>
-                    <div class="form-group d-flex justify-content-end">
-                        <button type="button" class="fancy-button btn btn-sm btn-secondary rounded-0 my-1" id="back-to-login-btn">Back to Login</button>
-                        <button type="submit" class="fancy-button btn btn-sm btn-primary rounded-0 my-1">Reset Password</button>
-                    </div>
-                </form>
-            </div>
+<body>
+
+<!-- full-bleed blurred background photo (static) and dark overlay -->
+<div class="bg-photo" aria-hidden="true"></div>
+<div class="bg-overlay" aria-hidden="true"></div>
+
+<!-- big title -->
+<div class="header-title">Julie's POS and Management System</div>
+
+<!-- main center -->
+<div class="center-wrap">
+  <!-- login panel -->
+  <div class="card login-card" id="login-panel">
+    <div class="card-inner">
+      <form id="login-form" autocomplete="off">
+        <div class="text-center mb-2"><img src="./images/tiny_logo.png" alt="Julie's" style="width:120px; height:auto;"></div>
+        <small>Please enter your credentials.</small>
+
+        <div class="mb-2">
+          <label for="username">Username</label>
+          <input id="username" name="username" autofocus class="form-control" required />
         </div>
+
+        <div class="mb-2">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" class="form-control" required />
+        </div>
+
+        <div class="actions-row">
+          <button type="button" id="forgot-btn" class="btn btn-secondary">Forgot Password?</button>
+          <button type="submit" class="btn btn-primary">Login</button>
+        </div>
+
+        <div class="footer-note">Employees only — contact admin for access</div>
+      </form>
     </div>
+  </div>
+
+  <!-- forgot -->
+  <div class="card login-card forgot-wrap" id="forgot-panel">
+    <div class="card-inner">
+      <form id="forgot-form">
+        <small>Reset password — enter email + new password</small>
+
+        <div class="mb-2">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" class="form-control" required />
+        </div>
+
+        <div class="mb-2">
+          <label for="new_password">New Password</label>
+          <input id="new_password" name="new_password" type="password" class="form-control" required />
+        </div>
+
+        <div class="mb-2">
+          <label for="confirm_password">Confirm Password</label>
+          <input id="confirm_password" name="confirm_password" type="password" class="form-control" required />
+        </div>
+
+        <div class="actions-row">
+          <button type="button" id="back-btn" class="btn btn-secondary">Back to Login</button>
+          <button type="submit" class="btn btn-primary">Reset Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+
 <script>
-    $(document).ready(function() {
-        // When the document is fully loaded, execute the following function
-        
-        // Click event handler for the 'Forgot Password' button
-        $('#forgot-btn').click(function() {
-            // Hide the login form
-            $('#login-form').hide();
-            // Show the forgot password form
-            $('#forgot-form').show();
-        });
+/* Matrix removed for uniformity with other pages */
 
-        // Click event handler for the 'Back to Login' button
-        $('#back-to-login-btn').click(function() {
-            // Hide the forgot password form
-            $('#forgot-form').hide();
-            // Show the login form
-            $('#login-form').show();
-        });
+/* simple UI behaviors (no external dependency required beyond jQuery already loaded) */
+$(function(){
+  // show forgot / back
+  $('#forgot-btn').click(function(){
+    $('#login-panel').hide();
+    $('#forgot-panel').show();
+  });
+  $('#back-btn').click(function(){
+    $('#forgot-panel').hide();
+    $('#login-panel').show();
+  });
 
-        // Submit event handler for the login form
-        $('#login-form').submit(function(e) {
-            // Prevent the default form submission
-            e.preventDefault();
-            var _this = $(this);
-            // Remove any existing messages
-            $('.pop_msg').remove();
-            // Create a new div element for displaying messages
-            var el = $('<div>');
-            el.addClass("pop_msg alert");
-            el.hide();
-            // Send an AJAX POST request to the login action
-            $.ajax({
-                url: './Actions.php?a=login',
-                method: 'POST',
-                data: _this.serialize(), // Serialize the form data
-                dataType: 'JSON',
-                error: err => {
-                    console.log(err);
-                    alert("An error occurred.");
-                },
-                success: function(resp) {
-                    // Handle the response from the server
-                    if (resp.status == 'success') {
-                        // If login is successful, redirect to the home page
-                        location.replace('./');
-                    } else if (resp.msg) {
-                        // If there is an error message, display it
-                        el.addClass('alert-danger');
-                        el.text(resp.msg);
-                        _this.prepend(el);
-                        el.show('slow');
-                    } else {
-                        alert("An error occurred.");
-                        console.log(resp);
-                    }
-                }
-            });
-        });
-
-        // Submit event handler for the forgot password form
-        $('#forgot-password-form').submit(function(e) {
-            // Prevent the default form submission
-            e.preventDefault();
-            var _this = $(this);
-            // Remove any existing messages
-            $('.pop_msg').remove();
-            // Create a new div element for displaying messages
-            var el = $('<div>');
-            el.addClass("pop_msg alert");
-            el.hide();
-            // Send an AJAX POST request to the reset password action
-            $.ajax({
-                url: './Actions.php?a=reset_password',
-                method: 'POST',
-                data: _this.serialize(), // Serialize the form data
-                dataType: 'json',
-                error: function(err) {
-                    console.error("AJAX error:", err);
-                    alert("An error occurred. Please check the console for details.");
-                },
-                success: function(resp) {
-                    // Handle the response from the server
-                    if (resp.status == 'success') {
-                        // If password reset is successful, display a success message and switch to the login form
-                        el.addClass('alert-success');
-                        el.text(resp.msg);
-                        _this.prepend(el);
-                        el.show('slow');
-                        $('#forgot-form').hide();
-                        $('#login-form').show();
-                    } else if (resp.msg) {
-                        // If there is an error message, display it
-                        el.addClass('alert-danger');
-                        el.text(resp.msg);
-                        _this.prepend(el);
-                        el.show('slow');
-                    } else {
-                        alert("An error occurred.");
-                        console.log(resp);
-                    }
-                }
-            });
-        });
-
-        // Hide the loading screen after 1.5 seconds
-        setTimeout(() => {
-            $('#loading-screen').fadeOut('slow');
-        }, 1500);
+  // login ajax
+  $('#login-form').on('submit', function(e){
+    e.preventDefault();
+    var $btn = $(this).find('button[type="submit"]').prop('disabled', true).text('Logging...');
+    $.ajax({
+      url: './Actions.php?a=login',
+      method: 'POST',
+      data: $(this).serialize(),
+      dataType: 'json',
+      success: function(resp){
+        if (resp && resp.status == 'success') {
+          location.replace('./');
+        } else {
+          alert(resp && resp.msg ? resp.msg : 'Login failed');
+        }
+      },
+      error: function(){ alert('Network error'); },
+      complete: function(){ $btn.prop('disabled', false).text('Login'); }
     });
+  });
+
+  // forgot form submit
+  $('#forgot-form').on('submit', function(e){
+    e.preventDefault();
+    var $btn = $(this).find('button[type="submit"]').prop('disabled', true).text('Saving...');
+    $.ajax({
+      url: './Actions.php?a=reset_password',
+      method: 'POST',
+      data: $(this).serialize(),
+      dataType: 'json',
+      success: function(resp){
+        if (resp && resp.status == 'success') {
+          alert('Password reset. Please login.');
+          $('#back-btn').click();
+        } else {
+          alert(resp && resp.msg ? resp.msg : 'Reset failed');
+        }
+      },
+      error: function(){ alert('Network error'); },
+      complete: function(){ $btn.prop('disabled', false).text('Reset Password'); }
+    });
+  });
+});
+
+$(document).ready(function() {
+    setTimeout(() => {
+        $('#loading-screen').fadeOut('slow');
+    }, 1500);
+});
+
+
 </script>
 </body>
 </html>

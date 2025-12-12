@@ -29,49 +29,69 @@ $qry = $conn->query("SELECT * FROM `category_list` where category_id = '{$_GET['
 </div>
 
 <script>
-    $(function(){
-        $('#category-form').submit(function(e){
-            e.preventDefault();
-            $('.pop_msg').remove()
-            var _this = $(this)
-            var _el = $('<div>')
-                _el.addClass('pop_msg')
-            $('#uni_modal button').attr('disabled',true)
-            $('#uni_modal button[type="submit"]').text('submitting form...')
-            $.ajax({
-                url:'./Actions.php?a=save_category',
-                method:'POST',
-                data:$(this).serialize(),
-                dataType:'JSON',
-                error:err=>{
-                    console.log(err)
-                    _el.addClass('alert alert-danger')
-                    _el.text("An error occurred.")
-                    _this.prepend(_el)
-                    _el.show('slow')
-                     $('#uni_modal button').attr('disabled',false)
-                     $('#uni_modal button[type="submit"]').text('Save')
-                },
-                success:function(resp){
-                    if(resp.status == 'success'){
-                        _el.addClass('alert alert-success')
-                        $('#uni_modal').on('hide.bs.modal',function(){
-                            location.reload()
-                        })
-                        if("<?php echo isset($category_id) ?>" != 1)
-                        _this.get(0).reset();
-                    }else{
-                        _el.addClass('alert alert-danger')
-                    }
-                    _el.text(resp.msg)
+$(function(){
 
-                    _el.hide()
-                    _this.prepend(_el)
-                    _el.show('slow')
-                     $('#uni_modal button').attr('disabled',false)
-                     $('#uni_modal button[type="submit"]').text('Save')
-                }
-            })
+    function showMsg($form, type, text, autoHide){
+        $('.pop_msg').remove();
+        var $m = $('<div>').addClass('pop_msg alert alert-'+type).text(text).hide();
+        $form.prepend($m);
+        $m.show('slow');
+        if(autoHide){
+            setTimeout(()=>{ $m.fadeOut(300,()=>{$m.remove();}); }, autoHide);
+        }
+    }
+
+    $('#category-form').on('submit', function(e){
+        e.preventDefault();
+        var $form = $(this);
+
+        let name = $.trim($form.find('[name="name"]').val());
+        let status = $form.find('[name="status"]').val();
+
+        let errors = [];
+
+        if(!name) errors.push("Category name is required.");
+        if(name.length < 2) errors.push("Category name must be at least 2 characters.");
+        if(status !== "0" && status !== "1") errors.push("Please select a valid status.");
+
+        if(errors.length){
+            showMsg($form, 'danger', errors.join(' '), 5000);
+            return;
+        }
+
+        var $btns = $('#uni_modal button');
+        $btns.prop('disabled', true);
+        $btns.filter('[type="submit"]').text('Submitting...');
+
+        $.ajax({
+            url:'./Actions.php?a=save_category',
+            method:'POST',
+            data:$form.serialize(),
+            dataType:'JSON'
         })
-    })
+        .done(function(resp){
+            if(resp.status === 'success'){
+                showMsg($form, 'success', resp.msg || "Saved successfully.", 1000);
+
+                $('#uni_modal').on('hide.bs.modal', ()=> location.reload());
+
+                // reset only if adding new
+                if("<?php echo isset($category_id) ?>" != 1){
+                    $form[0].reset();
+                }
+            } else {
+                showMsg($form, 'danger', resp.msg || "Failed to save category.", 5000);
+            }
+        })
+        .fail(function(){
+            showMsg($form, 'danger', "Server error occurred.", 5000);
+        })
+        .always(function(){
+            $btns.prop('disabled', false);
+            $btns.filter('[type="submit"]').text('Save');
+        });
+
+    });
+
+});
 </script>

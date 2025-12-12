@@ -7,11 +7,11 @@
 <style>
 :root{
     --radius:12px;
-    --card-bg:#ffffff;
+    --card-bg: #ffffff;
     --glow-opacity:.45;
     --glow-blur:36px;
-    --btn-start:#2d2d2d;
-    --btn-end:#5a5a5a;
+    --btn-start: #2d2d2d;
+    --btn-end: #5a5a5a;
     --btn-text:#ffffff;
 }
 
@@ -63,6 +63,13 @@
 @media (max-width:576px){
     .glowing-border{ padding:.8rem; border-radius:10px; }
     .btn-gradient{ padding:5px 10px; font-size:.95rem; }
+}
+
+.bg-danger.bg-opacity-25 {
+    color: var(--text-color) !important;
+}
+thead tr {
+    color: var(--text-color) !important;
 }
 </style>
 
@@ -181,7 +188,7 @@
                 </div> <!-- .row cards -->
                 <hr style="border-top: 1px solid rgba(0,0,0,0.1);">
 
-                <h3 class="mb-4" style="font-family: 'Arial', sans-serif; font-weight: bold; color: #333;">
+                <h3 class="mb-4 card-title">
                     Stock Available
                     <select id="categoryFilter" class="form-select d-inline-block w-auto ms-3">
                         <option value="all">All Categories</option>

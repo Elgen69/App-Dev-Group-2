@@ -71,7 +71,9 @@ $dto = isset($_GET['date_to']) ? $_GET['date_to'] : date("Y-m-d");
                 </tr>
                 <?php endwhile; ?>
                 <?php if($qry->num_rows <=0): ?>
-                    <th colspan="6"><center>No Transaction listed in selected date.</center></th>
+                    <tr>
+                        <td colspan="6" class="text-center empty-message">No Transaction listed in selected date.</td>
+                    </tr>
                 <?php endif; ?>
                
             </tbody>

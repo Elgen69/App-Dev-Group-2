@@ -88,78 +88,79 @@ if(isset($_GET['id'])){
 
 <script>
 $(function(){
-    // Handle form submission for product details
-    $('#product-form').submit(function(e){
-        e.preventDefault(); // Prevent default form submission behavior
-        $('.pop_msg').remove(); // Remove any previous pop-up messages
-        var _this = $(this);
-        var _el = $('<div>').addClass('pop_msg'); // Create a div element for pop-up messages
+  function showMsg($form, type, msg){
+    $('.pop_msg').remove();
+    var $el = $('<div>').addClass('pop_msg alert').addClass(type=='success'?'alert-success':'alert-danger').text(msg);
+    $form.prepend($el);
+    $el.show('slow');
+  }
 
-        $('#uni_modal button').attr('disabled', true); // Disable the form submit button
-        $('#uni_modal button[type="submit"]').text('submitting form...'); // Change button text to indicate form submission
+  $('#product-form').submit(function(e){
+    e.preventDefault();
+    var $f = $(this);
 
-        $.ajax({
-            url: './Actions.php?a=save_product', // URL to send the request to
-            data: new FormData($(this)[0]), // Serialize the form data
-            cache: false, // Do not cache the response
-            contentType: false, // Do not set the content type header
-            processData: false, // Do not process the data
-            method: 'POST',
-            type: 'POST',
-            dataType: 'json',
-            error: err => {
-                console.log(err); // Log any errors to the console
-                _el.addClass('alert alert-danger').text("An error occurred."); // Display an error message
-                _this.prepend(_el); // Add the error message to the form
-                _el.show('slow'); // Show the error message
-                $('#uni_modal button').attr('disabled', false); // Re-enable the submit button
-                $('#uni_modal button[type="submit"]').text('Save'); // Reset the button text
-            },
-            success: function(resp){
-                if(resp.status == 'success'){
-                    _el.addClass('alert alert-success'); // Display a success message
-                    $('#uni_modal').on('hide.bs.modal', function(){
-                        location.reload(); // Reload the page when the modal is hidden
-                    });
-                    if("<?php echo isset($product_id) ?>" != 1){
-                        _this.get(0).reset(); // Reset the form if the product ID is not set
-                        $('.select2').val('').trigger('change'); // Reset any select2 elements
-                    }
-                }else{
-                    _el.addClass('alert alert-danger'); // Display an error message
-                }
-                _el.text(resp.msg); // Set the message text
+    // Basic client-side validation
+    var code = $.trim($f.find('[name="product_code"]').val());
+    var cat  = $f.find('[name="category_id"]').val();
+    var name = $.trim($f.find('[name="name"]').val());
+    var price = parseFloat($f.find('[name="price"]').val());
+    var alert_restock = parseFloat($f.find('[name="alert_restock"]').val());
+    var description = $.trim($f.find('[name="description"]').val());
 
-                _el.hide(); // Hide the message initially
-                _this.prepend(_el); // Add the message to the form
-                _el.show('slow'); // Show the message
-                $('#uni_modal button').attr('disabled', false); // Re-enable the submit button
-                $('#uni_modal button[type="submit"]').text('Save'); // Reset the button text
-            }
-        });
-    });
+    if (!code){ showMsg($f,'error','Product code is required.'); return; }
+    if (!cat){ showMsg($f,'error','Please choose a category.'); return; }
+    if (!name){ showMsg($f,'error','Product name is required.'); return; }
+    if (isNaN(price) || price < 0){ showMsg($f,'error','Price must be a valid number >= 0.'); return; }
+    if (isNaN(alert_restock) || alert_restock < 0){ showMsg($f,'error','Alert restock must be a valid number >= 0.'); return; }
+    if (!description){ showMsg($f,'error','Description is required.'); return; }
 
-    // Handle image removal for products
-    $('.remove-image').click(function(){
-        var _this = $(this);
-        $.ajax({
-            url: './Actions.php?a=delete_image', // URL to send the request to
-            method: 'POST',
-            data: {id: _this.data('id')}, // Send the image ID to be deleted
-            dataType: 'json',
-            error: err => {
-                console.log(err); // Log any errors to the console
-                alert("An error occurred."); // Display an error alert
-            },
-            success: function(resp){
-                if(resp.status == 'success'){
-                    _this.closest('.img-item').remove(); // Remove the image item if deletion is successful
-                }else{
-                    alert(resp.msg); // Display an error message
-                }
-            }
-        });
-    });
+    // disable and submit
+    var $btn = $('#uni_modal button[type="submit"]');
+    $btn.prop('disabled', true).text('Submitting...');
+
+    $.ajax({
+      url: './Actions.php?a=save_product',
+      data: new FormData($f[0]),
+      cache: false,
+      contentType: false,
+      processData: false,
+      method: 'POST',
+      dataType: 'json'
+    }).done(function(resp){
+      if (resp && resp.status == 'success'){
+        showMsg($f,'success', resp.msg || 'Product saved.');
+        // reset form only for new product
+        if(!('<?php echo isset($product_id) ? 1 : 0 ?>')){
+          $f[0].reset();
+          $('.select2').val('').trigger('change');
+        }
+        // reload after small delay (so user sees message)
+        setTimeout(function(){ location.reload(); }, 600);
+      } else {
+        showMsg($f,'error', (resp && resp.msg) ? resp.msg : 'Save failed.');
+      }
+    }).fail(function(xhr, st, err){
+      console.error(xhr,st,err);
+      showMsg($f,'error','Network/server error. Check console.');
+    }).always(function(){ $btn.prop('disabled', false).text('Save'); });
+
+  });
+
+  // image remove uses image identifier: make sure your server expects image id, not product id
+  $(document).on('click', '.remove-image', function(){
+    var $btn = $(this);
+    var imgId = $btn.data('id');
+    if(!imgId) return alert('Missing image id.');
+    if(!confirm('Remove this image?')) return;
+    $.post('./Actions.php?a=delete_image', { id: imgId }, function(resp){
+      try { resp = typeof resp === 'string' ? JSON.parse(resp) : resp; } catch(e){}
+      if (resp && resp.status == 'success'){
+        $btn.closest('.img-item').remove();
+      } else {
+        alert(resp && resp.msg ? resp.msg : 'Delete failed');
+      }
+    }, 'json').fail(function(){ alert('Delete failed'); });
+  });
+
 });
 </script>
-

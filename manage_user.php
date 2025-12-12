@@ -44,52 +44,114 @@ if(isset($_GET['id'])){
 
 
 <script>
-    $(function(){
-        $('#user-form').submit(function(e){
-            e.preventDefault();
-            $('.pop_msg').remove()
-            var _this = $(this)
-            var _el = $('<div>')
-                _el.addClass('pop_msg')
-            $('#uni_modal button').attr('disabled',true)
-            $('#uni_modal button[type="submit"]').text('submitting form...')
-            $.ajax({
-                url:'./Actions.php?a=save_user',
-                method:'POST',
-                data:$(this).serialize(),
-                dataType:'JSON',
-                error:err=>{
-                    console.log(err)
-                    _el.addClass('alert alert-danger')
-                    _el.text("An error occurred.")
-                    _this.prepend(_el)
-                    _el.show('slow')
-                    $('#uni_modal button').attr('disabled',false)
-                    $('#uni_modal button[type="submit"]').text('Save')
-                },
-                success:function(resp){
-                    if(resp.status == 'success'){
-                        _el.addClass('alert alert-success')
-                        $('#uni_modal').on('hide.bs.modal',function(){
-                            location.reload()
-                        })
-                        if("<?php echo isset($user_id) ?>" != 1){
-                            _this.get(0).reset();
-                            // Display initial password
-                            alert("User created successfully. Initial Password: " + resp.initial_password);
-                        }
-                    }else{
-                        _el.addClass('alert alert-danger')
-                    }
-                    _el.text(resp.msg)
+$(function(){
 
-                    _el.hide()
-                    _this.prepend(_el)
-                    _el.show('slow')
-                    $('#uni_modal button').attr('disabled',false)
-                    $('#uni_modal button[type="submit"]').text('Save')
-                }
-            })
+    function showFormMessage($form, type, text, autoHideMs){
+        $('.pop_msg').remove();
+        var $msg = $('<div>').addClass('pop_msg alert').addClass('alert-' + type).text(text).hide();
+        $form.prepend($msg);
+        $msg.show('slow');
+        if(autoHideMs){
+            setTimeout(function(){ $msg.fadeOut(300, function(){ $(this).remove(); }); }, autoHideMs);
+        }
+        return $msg;
+    }
+
+    function isValidEmail(email){
+        var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+    }
+
+    $('#user-form').on('submit', function(e){
+        e.preventDefault();
+        var $form = $(this);
+        $('.pop_msg').remove();
+
+        var user_id = $.trim($form.find('[name="id"]').val() || '');
+        var fullname = $.trim($form.find('[name="fullname"]').val() || '');
+        var username = $.trim($form.find('[name="username"]').val() || '');
+        var email = $.trim($form.find('[name="email"]').val() || '');
+        var type = $form.find('[name="type"]').val();
+
+        // When editing — optional password update
+        var password = $.trim($form.find('[name="password"]').val() || '');
+        var confirm = $.trim($form.find('[name="confirm_password"]').val() || '');
+
+        var creating = (user_id === '');
+        var errors = [];
+
+        // Required fields
+        if(!fullname) errors.push('Fullname is required.');
+        if(!username) errors.push('Username is required.');
+        if(!type) errors.push('Please select account type.');
+
+        // Email optional but must be valid if present
+        if(email && !isValidEmail(email)) errors.push('Email format is invalid.');
+
+        // ONLY VALIDATE PASSWORD IF EDITING AND THEY TYPE SOMETHING
+        if(!creating && password){
+            if(password.length < 6) errors.push('Password must be at least 6 characters.');
+            if(password !== confirm) errors.push('Password and confirmation do not match.');
+        }
+
+        if(errors.length){
+            showFormMessage($form, 'danger', errors.join(' '), 6000);
+            return;
+        }
+
+        var $btns = $('#uni_modal button');
+        $btns.prop('disabled', true);
+        $btns.filter('[type="submit"]').text('Submitting...');
+
+        $.ajax({
+            url: './Actions.php?a=save_user',
+            method: 'POST',
+            data: $form.serialize(),
+            dataType: 'json',
+            timeout: 30000
         })
-    })
+        .done(function(resp){
+            if(!resp){
+                showFormMessage($form, 'danger', 'Empty server response.', 5000);
+                return;
+            }
+
+            if(resp.status === 'success'){
+                showFormMessage($form, 'success', resp.msg || 'User saved.', 1500);
+
+                // 🎉 NEW USER — show the auto-generated password
+                if(creating && resp.initial_password){
+                    setTimeout(function(){
+                        alert(
+                            'User created successfully.\n' +
+                            'Initial Password: ' + resp.initial_password
+                        );
+                        $('#uni_modal').modal('hide');
+                        location.reload();
+                    }, 700);
+                    return;
+                }
+
+                // EDIT SUCCESS → Reload
+                setTimeout(function(){
+                    $('#uni_modal').modal('hide');
+                    location.reload();
+                }, 700);
+
+            } else {
+                showFormMessage($form, 'danger', resp.msg || 'Failed to save user.', 6000);
+            }
+        })
+        .fail(function(xhr, status, err){
+            console.error('AJAX error', status, err, xhr?.responseText);
+            showFormMessage($form, 'danger', 'Server error occurred while saving user.', 7000);
+        })
+        .always(function(){
+            $btns.prop('disabled', false);
+            $btns.filter('[type="submit"]').text('Save');
+        });
+
+    });
+
+});
 </script>
